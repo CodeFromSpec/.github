@@ -1,7 +1,3 @@
----
-version: 7
----
-
 # Code From Spec
 
 **Code from Spec** is a methodology where code is a generated
