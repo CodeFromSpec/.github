@@ -32,25 +32,11 @@ must be reviewed and regenerated.
 
 ---
 
-## The resync loop
-
-1. **Check spec staleness** — find nodes whose parent or
-   dependencies changed and update them.
-2. **Check code staleness** — find generated files whose spec
-   version changed and regenerate them.
-3. **Verify** — build and run tests. If anything fails, fix the
-   spec, not the code.
-
-Each step is handled by a dedicated AI agent operating on a
-well-defined, self-contained input.
-
----
-
 ## Methodology files
 
 | File | Purpose |
 |---|---|
-| [`CODE_FROM_SPEC.md`](CODE_FROM_SPEC.md) | Overview and resync procedure |
+| [`framework/CODE_FROM_SPEC.md`](framework/CODE_FROM_SPEC.md) | Overview and resync procedure |
 | [`framework/SPECIFICATIONS.md`](framework/SPECIFICATIONS.md) | Spec tree structure and node format |
 | [`framework/VERSIONING_AND_STALENESS.md`](framework/VERSIONING_AND_STALENESS.md) | Versioning rules and staleness conditions |
 | [`framework/EXTERNAL_DEPENDENCIES.md`](framework/EXTERNAL_DEPENDENCIES.md) | External dependency format |
@@ -78,6 +64,6 @@ To fetch a specific version of the methodology, use the raw URLs
 from the appropriate branch:
 
 ```
-https://raw.githubusercontent.com/CodeFromSpec/.github/v1/CODE_FROM_SPEC.md
+https://raw.githubusercontent.com/CodeFromSpec/.github/v1/framework/CODE_FROM_SPEC.md
 https://raw.githubusercontent.com/CodeFromSpec/.github/v1/framework/SPECIFICATIONS.md
 ```
