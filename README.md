@@ -50,7 +50,7 @@ must be reviewed and regenerated.
 
 | Repository | Description |
 |---|---|
-| [spec-staleness-check](https://github.com/CodeFromSpec/spec-staleness-check) | CLI tool that automates spec staleness verification |
+| [tool-staleness-check](https://github.com/CodeFromSpec/tool-staleness-check) | CLI tool that automates staleness verification |
 
 ---
 
