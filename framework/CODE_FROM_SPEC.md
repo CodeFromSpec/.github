@@ -41,17 +41,6 @@ root/
 
 ---
 
-## Resources
-
-External resources required to operate this framework:
-
-| Resource | URL |
-|---|---|
-| Code generation agent instructions | `PLACEHOLDER_AGENT_CODE_GENERATION_URL` |
-| `staleness-check` tool | https://github.com/CodeFromSpec/tool-staleness-check/releases/tag/v1.0.2 |
-
----
-
 ## Specifications
 
 Specifications are the source of truth from which code is generated.
@@ -460,3 +449,14 @@ changes, or a full regeneration is needed — run a resync:
 
 3. **Verify** — build and run tests. If anything fails, trace back
    to the spec and correct it. Do not patch the generated code.
+
+---
+
+## Resources
+
+External resources required to operate this framework:
+
+| Resource | URL |
+|---|---|
+| Code generation agent instructions | https://raw.githubusercontent.com/CodeFromSpec/.github/main/framework/AGENT_CODE_GENERATION.md |
+| `staleness-check` tool | https://github.com/CodeFromSpec/tool-staleness-check/releases/tag/v1.0.2 |
