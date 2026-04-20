@@ -41,6 +41,17 @@ root/
 
 ---
 
+## Resources
+
+External resources required to operate this framework:
+
+| Resource | URL |
+|---|---|
+| Code generation agent instructions | `PLACEHOLDER_AGENT_CODE_GENERATION_URL` |
+| `staleness-check` tool | https://github.com/CodeFromSpec/tool-staleness-check/releases/tag/v1.0.2 |
+
+---
+
 ## Specifications
 
 Specifications are the source of truth from which code is generated.
@@ -428,8 +439,7 @@ EXTERNAL/database             (_external.md + schema.sql)
 The chain is the complete context. Nothing outside the chain is
 needed. Nothing inside the chain is redundant.
 
-See `framework/AGENT_CODE_GENERATION.md` for the agent's rules and
-procedures.
+See Resources for the agent's instruction file URL.
 
 ---
 
@@ -446,8 +456,7 @@ changes, or a full regeneration is needed — run a resync:
    dependents.
 
 2. **Generate code** — run `staleness-check` again. For each stale
-   file, dispatch a code generation agent (see
-   `framework/AGENT_CODE_GENERATION.md`).
+   file, dispatch a code generation agent (see Resources).
 
 3. **Verify** — build and run tests. If anything fails, trace back
    to the spec and correct it. Do not patch the generated code.
