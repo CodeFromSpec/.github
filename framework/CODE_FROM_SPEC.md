@@ -440,15 +440,17 @@ See Resources for the agent's instruction file URL.
 When something changes — a spec is updated, an external dependency
 changes, or a full regeneration is needed — run a resync:
 
-1. **Detect and resolve spec staleness** — run `staleness-check`.
-   For each stale node, revise the spec content if needed and
-   update the declared versions. If changes introduce ambiguity or
-   require human judgment, stop and consult the user. Process in
-   dependency order: parents before children, dependencies before
-   dependents.
+1. **Resolve spec staleness** — call `staleness-check`. Fix the
+   first stale spec or test node it reports, then call the tool
+   again. Repeat until no spec or test nodes are stale. The tool
+   reports top-down, so resolving a parent before its children
+   avoids cascading rework. If a fix introduces ambiguity or
+   requires human judgment, stop and consult the user.
 
-2. **Generate code** — run `staleness-check` again. For each stale
-   file, dispatch a code generation agent (see Resources).
+2. **Generate code** — call `staleness-check`. Dispatch a code
+   generation subagent for the first stale file it reports (see
+   Resources), then call the tool again. Repeat until no stale
+   files remain.
 
 3. **Verify** — build and run tests. If anything fails, trace back
    to the spec and correct it. Do not patch the generated code.
