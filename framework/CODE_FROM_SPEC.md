@@ -377,16 +377,42 @@ node.version != version in the file's // spec: comment
 
 ## Staleness Verification
 
-Staleness is verified by the `staleness-check` tool. Spec staleness
-must be resolved before code staleness — code generated from stale
-specs produces meaningless results.
+Staleness is verified by the `staleness-check` tool. The tool
+reports stale items in a fixed order: spec nodes first (top-down),
+then test nodes, then generated source files.
+
+---
+
+## Staleness Resolution
+
+Resolving staleness means reviewing each stale node in light of
+what changed — the parent or dependency that triggered the
+staleness — and determining whether the node's own content needs
+to be updated. The version bump is the consequence of that review,
+not the act itself. Skipping the review reduces versioning to
+theater.
+
+The resolution process is iterative: call `staleness-check`, address
+the first item it reports, call the tool again, repeat. Because the
+tool reports top-down, resolving a parent before its children avoids
+cascading rework. If a resolution introduces ambiguity or requires
+human judgment, stop and consult the user.
+
+The three layers of staleness must be resolved in strict sequence:
+
+1. **Spec nodes** — all spec nodes must be clean before proceeding.
+2. **Test nodes** — all test nodes must be clean before proceeding.
+3. **Generated source files** — resolved during Resync (see below).
+
+Generating code from stale spec or test nodes is wasteful — the
+output will be stale before it is written.
 
 ---
 
 ## Code Generation
 
 The orchestrator dispatches a code generation subagent for each
-stale file. The subagent receives a self-contained set of
+stale source file. The subagent receives a self-contained set of
 instructions and a structured input — it does not explore the
 filesystem or read anything beyond what it receives. The
 orchestrator is responsible for assembling the correct input; if
@@ -437,22 +463,19 @@ See Resources for the agent's instruction file URL.
 
 ## Resync
 
-When something changes — a spec is updated, an external dependency
-changes, or a full regeneration is needed — run a resync:
+A resync synchronizes generated source files with the current state
+of the spec. Run a resync when a spec changes, an external
+dependency changes, or a full regeneration is needed.
 
-1. **Resolve spec staleness** — call `staleness-check`. Fix the
-   first stale spec or test node it reports, then call the tool
-   again. Repeat until no spec or test nodes are stale. The tool
-   reports top-down, so resolving a parent before its children
-   avoids cascading rework. If a fix introduces ambiguity or
-   requires human judgment, stop and consult the user.
+Before running a resync, all spec and test node staleness must be
+resolved (see Staleness Resolution).
 
-2. **Generate code** — call `staleness-check`. Dispatch a code
+1. **Generate code** — call `staleness-check`. Dispatch a code
    generation subagent for the first stale file it reports (see
    Resources), then call the tool again. Repeat until no stale
    files remain.
 
-3. **Verify** — build and run tests. If anything fails, trace back
+2. **Verify** — build and run tests. If anything fails, trace back
    to the spec and correct it. Do not patch the generated code.
 
 ---
