@@ -33,10 +33,8 @@ root/
 ```
 /
   code-from-spec/
-    CODE_FROM_SPEC.md      ← this file
     spec/                  ← spec tree
     external/              ← external dependencies
-    framework/             ← framework documentation
 ```
 
 ---
