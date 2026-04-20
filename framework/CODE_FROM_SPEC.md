@@ -373,24 +373,17 @@ A generated source file is stale when:
 node.version != version in the file's // spec: comment
 ```
 
----
+Staleness verification is automated by the `staleness-check` tool.
+The tool reports stale items in a fixed order: spec nodes first
+(top-down), then test nodes, then generated source files.
 
-## Staleness Verification
-
-Staleness is verified by the `staleness-check` tool. The tool
-reports stale items in a fixed order: spec nodes first (top-down),
-then test nodes, then generated source files.
-
----
-
-## Staleness Resolution
+### Resolution
 
 Resolving staleness means reviewing each stale node in light of
-what changed — the parent or dependency that triggered the
-staleness — and determining whether the node's own content needs
-to be updated. The version bump is the consequence of that review,
-not the act itself. Skipping the review reduces versioning to
-theater.
+how the parent or dependency that triggered the staleness changed,
+and determining whether the node's own content needs to be updated. The version bump is the consequence of that review,
+not the act itself. Skipping the content review defeats the purpose
+of versioning.
 
 The resolution process is iterative: call `staleness-check`, address
 the first item it reports, call the tool again, repeat. Because the
