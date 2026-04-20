@@ -425,6 +425,22 @@ ROOT/payments/fees/calculation (spec/payments/fees/calculation/_node.md)
 EXTERNAL/database             (_external.md + schema.sql)
 ```
 
+For test nodes, the chain extends the leaf node's chain:
+
+```
+ROOT                          (spec/_node.md)
+ROOT/payments                 (spec/payments/_node.md)
+ROOT/payments/fees            (spec/payments/fees/_node.md)
+ROOT/payments/fees/calculation (spec/payments/fees/calculation/_node.md)
+EXTERNAL/database             (_external.md + schema.sql)    ← leaf's depends_on
+TEST/payments/fees/calculation (spec/payments/fees/calculation/default.test.md)
+EXTERNAL/fixtures             (_external.md + data.sql)      ← test node's own depends_on
+```
+
+The leaf node's `depends_on` content is included implicitly — the
+test node depends fundamentally on its test subject. The test node's
+own `depends_on` covers only what the test node needs beyond that.
+
 The chain is the complete context. Nothing outside the chain is
 needed. Nothing inside the chain is redundant.
 
