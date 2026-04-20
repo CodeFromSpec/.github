@@ -33,10 +33,8 @@ root/
 ```
 /
   code-from-spec/
-    CODE_FROM_SPEC.md      ← this file
     spec/                  ← spec tree
     external/              ← external dependencies
-    framework/             ← framework documentation
 ```
 
 ---
@@ -375,39 +373,47 @@ A generated source file is stale when:
 node.version != version in the file's // spec: comment
 ```
 
----
+Staleness verification is automated by the `staleness-check` tool.
+The tool reports stale items in a fixed order: spec nodes first
+(top-down), then test nodes, then generated source files.
 
-## Staleness Verification
+### Resolution
 
-Staleness is verified by the `staleness-check` tool. Spec staleness
-must be resolved before code staleness — code generated from stale
-specs produces meaningless results.
+Resolving staleness means reviewing each stale node in light of
+how the parent or dependency that triggered the staleness changed,
+and determining whether the node's own content needs to be updated. The version bump is the consequence of that review,
+not the act itself. Skipping the content review defeats the purpose
+of versioning.
 
----
+The resolution process is iterative: call `staleness-check`, address
+the first item it reports, call the tool again, repeat. Because the
+tool reports top-down, resolving a parent before its children avoids
+cascading rework. If a resolution introduces ambiguity or requires
+human judgment, stop and consult the user.
 
-## Orchestration
+The three layers of staleness must be resolved in strict sequence:
 
-The main agent (orchestrator) does not verify staleness or generate
-code directly. It dispatches subagents, each with a specific role
-and a self-contained set of instructions.
+1. **Spec nodes** — all spec nodes must be clean before proceeding.
+2. **Test nodes** — all test nodes must be clean before proceeding.
+3. **Generated source files** — resolved during Resync (see below).
 
-Each subagent receives:
-- An instruction file (`AGENT_*.md`) defining its rules, procedure,
-  and allowed operations.
-- A structured input (YAML) with the specific data to process.
-
-Subagents operate only with what they receive. They do not explore
-the filesystem, search for files, or read anything beyond what
-their instructions allow. The orchestrator is responsible for
-assembling the correct input — if the input is wrong or incomplete,
-the subagent's output will be wrong.
+Generating code from stale spec or test nodes is wasteful — the
+output will be stale before it is written.
 
 ---
 
 ## Code Generation
 
-The orchestrator assembles the context for each code generation
-agent by building the **chain** — the ordered sequence of ancestor
+The orchestrator dispatches a code generation subagent for each
+stale source file. The subagent receives a self-contained set of
+instructions and a structured input — it does not explore the
+filesystem or read anything beyond what it receives. The
+orchestrator is responsible for assembling the correct input; if
+the input is wrong or incomplete, the subagent's output will be
+wrong.
+
+The orchestrator assembles the context for each subagent by
+building the **chain** — the ordered sequence of ancestor
 `_node.md` files from root to the target leaf node, followed by
 any `depends_on` content.
 
@@ -425,6 +431,22 @@ ROOT/payments/fees/calculation (spec/payments/fees/calculation/_node.md)
 EXTERNAL/database             (_external.md + schema.sql)
 ```
 
+For test nodes, the chain extends the leaf node's chain:
+
+```
+ROOT                          (spec/_node.md)
+ROOT/payments                 (spec/payments/_node.md)
+ROOT/payments/fees            (spec/payments/fees/_node.md)
+ROOT/payments/fees/calculation (spec/payments/fees/calculation/_node.md)
+EXTERNAL/database             (_external.md + schema.sql)    ← leaf's depends_on
+TEST/payments/fees/calculation (spec/payments/fees/calculation/default.test.md)
+EXTERNAL/fixtures             (_external.md + data.sql)      ← test node's own depends_on
+```
+
+The leaf node's `depends_on` content is included implicitly — the
+test node depends fundamentally on its test subject. The test node's
+own `depends_on` covers only what the test node needs beyond that.
+
 The chain is the complete context. Nothing outside the chain is
 needed. Nothing inside the chain is redundant.
 
@@ -434,20 +456,19 @@ See Resources for the agent's instruction file URL.
 
 ## Resync
 
-When something changes — a spec is updated, an external dependency
-changes, or a full regeneration is needed — run a resync:
+A resync synchronizes generated source files with the current state
+of the spec. Run a resync when a spec changes, an external
+dependency changes, or a full regeneration is needed.
 
-1. **Detect and resolve spec staleness** — run `staleness-check`.
-   For each stale node, revise the spec content if needed and
-   update the declared versions. If changes introduce ambiguity or
-   require human judgment, stop and consult the user. Process in
-   dependency order: parents before children, dependencies before
-   dependents.
+Before running a resync, all spec and test node staleness must be
+resolved (see Staleness Resolution).
 
-2. **Generate code** — run `staleness-check` again. For each stale
-   file, dispatch a code generation agent (see Resources).
+1. **Generate code** — call `staleness-check`. Dispatch a code
+   generation subagent for the first stale file it reports (see
+   Resources), then call the tool again. Repeat until no stale
+   files remain.
 
-3. **Verify** — build and run tests. If anything fails, trace back
+2. **Verify** — build and run tests. If anything fails, trace back
    to the spec and correct it. Do not patch the generated code.
 
 ---
