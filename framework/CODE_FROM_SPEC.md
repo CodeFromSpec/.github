@@ -383,29 +383,18 @@ specs produces meaningless results.
 
 ---
 
-## Orchestration
-
-The main agent (orchestrator) does not verify staleness or generate
-code directly. It dispatches subagents, each with a specific role
-and a self-contained set of instructions.
-
-Each subagent receives:
-- An instruction file (`AGENT_*.md`) defining its rules, procedure,
-  and allowed operations.
-- A structured input (YAML) with the specific data to process.
-
-Subagents operate only with what they receive. They do not explore
-the filesystem, search for files, or read anything beyond what
-their instructions allow. The orchestrator is responsible for
-assembling the correct input — if the input is wrong or incomplete,
-the subagent's output will be wrong.
-
----
-
 ## Code Generation
 
-The orchestrator assembles the context for each code generation
-agent by building the **chain** — the ordered sequence of ancestor
+The orchestrator dispatches a code generation subagent for each
+stale file. The subagent receives a self-contained set of
+instructions and a structured input — it does not explore the
+filesystem or read anything beyond what it receives. The
+orchestrator is responsible for assembling the correct input; if
+the input is wrong or incomplete, the subagent's output will be
+wrong.
+
+The orchestrator assembles the context for each subagent by
+building the **chain** — the ordered sequence of ancestor
 `_node.md` files from root to the target leaf node, followed by
 any `depends_on` content.
 
