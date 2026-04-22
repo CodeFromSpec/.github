@@ -8,4 +8,4 @@ edit generated code directly.
 Designed for AI agent participation at every stage — writing specs,
 detecting staleness, generating code.
 
-→ [Read the methodology](https://github.com/CodeFromSpec/.github)
+→ [Read the methodology](https://github.com/CodeFromSpec/framework)
